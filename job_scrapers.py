@@ -41,7 +41,7 @@ def _match_any(text: str, keywords: List[str]) -> bool:
 # ---------------- Internshala ----------------
 
 def scrape_internshala(skills: List[str], location: str = "", max_pages: int = 1) -> List[Dict]:
-    """Scrape Internshala internship listings.
+    """Scrape Internshala internship listings (generic listing).
     Note: Public pages are paginated; we keep it light with max_pages.
     """
     jobs: List[Dict] = []
@@ -60,16 +60,34 @@ def scrape_internshala(skills: List[str], location: str = "", max_pages: int = 1
             soup = BeautifulSoup(r.text, "lxml")
             cards = soup.select("div.container-fluid.individual_internship")
             for card in cards:
-                title = (card.select_one("a.job-title") or card.select_one("h3\n a")).get_text(strip=True) if card else "Internship"
+                title = (card.select_one("a.job-title") or card.select_one("h3\n a") or card.select_one("h3 a")).get_text(strip=True) if card else "Internship"
                 company = (card.select_one("a.link_display_like_text") or card.select_one("div.company_name")).get_text(strip=True) if card else ""
                 loc_el = card.select_one("a.location_link") or card.select_one("span#location_names")
                 location_text = loc_el.get_text(strip=True) if loc_el else ""
                 stipend = (card.select_one("span.stipend") or card.select_one("div.stipend")).get_text(strip=True) if card else None
-                date_posted = (card.select_one("div.status-container") or card.select_one("div.other_detail_item")).get_text(strip=True) if card else None
+                # Heuristic for duration
+                dur = None
+                for d in card.select("div.other_detail_item, span.other_detail_item"):
+                    t = d.get_text(" ", strip=True)
+                    if any(x in t.lower() for x in ["month", "week", "day"]):
+                        dur = t
+                        break
+                # Try to capture a short summary/snippet from the card
+                desc = None
+                for sel in [
+                    "div.job-snippet", "div#job-snippet", "div.job-description", "div.desc", "div.internship_about",
+                    "div.text-ellipsis", "div.collapse", "div.job-snippet-container"
+                ]:
+                    el = card.select_one(sel)
+                    if el:
+                        txt = el.get_text(" ", strip=True)
+                        if txt:
+                            desc = txt
+                            break
                 link_el = card.select_one("a.view_detail_button") or card.select_one("a.job-title")
                 link = "https://internshala.com" + link_el.get("href") if link_el and link_el.get("href") else url
 
-                text_blob = " ".join([title or "", company or "", location_text or ""]).lower()
+                text_blob = " ".join([title or "", company or "", location_text or "", (desc or "")]).lower()
                 if not _match_any(text_blob, skills):
                     continue
 
@@ -79,7 +97,70 @@ def scrape_internshala(skills: List[str], location: str = "", max_pages: int = 1
                     "location": location_text,
                     "tags": ["internship"],
                     "salary": stipend,
-                    "posted_at": date_posted,
+                    "duration": dur,
+                    "description": desc,
+                    "posted_at": None,
+                    "url": link,
+                    "source": "internshala",
+                })
+            time.sleep(1)
+        except Exception:
+            continue
+    return jobs
+
+from urllib.parse import quote_plus
+
+def scrape_internshala_by_keywords(query: str, location: str = "India", max_pages: int = 1) -> List[Dict]:
+    """Scrape Internshala using keywords/location URL pattern.
+    URL: https://internshala.com/internships/keywords-{query}/in-{location}
+    """
+    jobs: List[Dict] = []
+    q = quote_plus((query or "").strip())
+    loc = quote_plus((location or "India").strip())
+    base = f"https://internshala.com/internships/keywords-{q}/in-{loc}"
+
+    for page in range(1, max_pages + 1):
+        url = base if page == 1 else f"{base}?page={page}"
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=10)
+            if r.status_code != 200:
+                continue
+            soup = BeautifulSoup(r.text, "lxml")
+            cards = soup.select("div.container-fluid.individual_internship")
+            for card in cards:
+                title = (card.select_one("a.job-title") or card.select_one("h3 a")).get_text(strip=True) if card else "Internship"
+                company = (card.select_one("a.link_display_like_text") or card.select_one("div.company_name")).get_text(strip=True) if card else ""
+                loc_el = card.select_one("a.location_link") or card.select_one("span#location_names")
+                location_text = loc_el.get_text(strip=True) if loc_el else location
+                stipend = (card.select_one("span.stipend") or card.select_one("div.stipend")).get_text(strip=True) if card else None
+                duration = None
+                for d in card.select("div.other_detail_item, span.other_detail_item"):
+                    t = d.get_text(" ", strip=True)
+                    if any(x in t.lower() for x in ["month", "week", "day"]):
+                        duration = t
+                        break
+                # Try to capture a short summary/snippet from the card
+                desc = None
+                for sel in [
+                    "div.job-snippet", "div#job-snippet", "div.job-description", "div.desc", "div.internship_about",
+                    "div.text-ellipsis", "div.collapse", "div.job-snippet-container"
+                ]:
+                    el = card.select_one(sel)
+                    if el:
+                        txt = el.get_text(" ", strip=True)
+                        if txt:
+                            desc = txt
+                            break
+                link_el = card.select_one("a.view_detail_button") or card.select_one("a.job-title")
+                href = link_el.get("href") if link_el else None
+                link = "https://internshala.com" + href if href and href.startswith('/') else (href or url)
+                jobs.append({
+                    "title": title,
+                    "company": company,
+                    "location": location_text,
+                    "stipend": stipend,
+                    "duration": duration,
+                    "description": desc,
                     "url": link,
                     "source": "internshala",
                 })
