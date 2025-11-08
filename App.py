@@ -1339,7 +1339,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ======== Search Status (Cleaner Style) ========
-if predicted_category:
+if "predicted_category" in locals() and predicted_category:
     st.markdown(f"""
     <div style="
         background: rgba(59,130,246,0.12);
@@ -1363,6 +1363,7 @@ if predicted_category:
         ">'{query_str}'</code>
     </div>
     """, unsafe_allow_html=True)
+
     
     # Separate Internshala keyword + location inputs
     c_ik, c_il, c_ib = st.columns([3, 2, 1])
