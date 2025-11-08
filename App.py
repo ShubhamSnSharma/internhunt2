@@ -27,7 +27,10 @@ from utils import AnalyticsUtils
 from chat_service import chat_gemini, build_resume_context, check_gemini_health, get_suggested_questions
 from streamlit.components.v1 import html as st_html  # legacy; floating chat removed
 from job_scrapers import scrape_all, scrape_internshala, scrape_internshala_by_keywords
-from Courses import ds_course, web_course, android_course, ios_course, uiux_course
+from Courses import (
+    ds_course, web_course, android_course, ios_course, uiux_course,
+    ai_course, cyber_course, cloud_course, data_eng_course, blockchain_course
+)
 
 import warnings
 warnings.filterwarnings("ignore", message="coroutine 'expire_cache' was never awaited")
@@ -101,159 +104,250 @@ def predict_resume_category(resume_text, model=None):
 def get_courses_by_category(predicted_category):
     """Get relevant courses based on predicted category"""
     category_course_map = {
+        # --- Programming & Software ---
         'Java Developer': web_course + android_course,
-        'Python Developer': ds_course + web_course,
-        'Data Science': ds_course,
-        'Web Designing': web_course + uiux_course,
-        'DevOps Engineer': ds_course,  # Cloud/infrastructure courses
-        'HR': [],  # No specific tech courses
+        'Python Developer': ds_course + web_course + ai_course,
+        'DotNet Developer': web_course,
+        'Automation Testing': web_course,
         'Testing': web_course,
-        'Database': ds_course,
-        'Blockchain': web_course,
+
+        # --- Data & AI ---
+        'Data Science': ds_course + ai_course + data_eng_course,
+        'Machine Learning Engineer': ai_course + ds_course,
+        'AI Engineer': ai_course + ds_course,
+        'Artificial Intelligence': ai_course + ds_course,
+        'Business Analyst': ds_course + data_eng_course,
+
+        # --- Web & Design ---
+        'Web Designing': web_course + uiux_course,
+        'Frontend Developer': web_course + uiux_course,
+        'Full Stack Developer': web_course + cloud_course,
+        'UI/UX Designer': uiux_course,
+
+        # --- Cloud & DevOps ---
+        'DevOps Engineer': cloud_course,
+        'Cloud Engineer': cloud_course,
+        'Site Reliability Engineer': cloud_course,
+
+        # --- Cybersecurity ---
+        'Network Security Engineer': cyber_course,
+        'Cybersecurity Analyst': cyber_course,
+        'Ethical Hacker': cyber_course,
+
+        # --- Database & Big Data ---
+        'Database': data_eng_course,
+        'Hadoop': data_eng_course,
+        'ETL Developer': data_eng_course,
+        'Data Engineer': data_eng_course,
+
+        # --- Blockchain & Web3 ---
+        'Blockchain': blockchain_course,
+        'Web3 Developer': blockchain_course,
+        'Smart Contract Developer': blockchain_course,
+
+        # --- Others / General Fields ---
+        'HR': [],
         'Operations Manager': [],
-        'SAP Developer': [],
+        'SAP Developer': cloud_course,
         'Mechanical Engineer': [],
         'Civil Engineer': [],
         'Electrical Engineering': [],
-        'Network Security Engineer': web_course,
-        'DotNet Developer': web_course,
-        'Automation Testing': web_course,
-        'Hadoop': ds_course,
-        'ETL Developer': ds_course,
-        'Business Analyst': ds_course,
         'Sales': [],
         'Arts': uiux_course,
         'Health and fitness': [],
         'Advocate': [],
         'PMO': [],
     }
-    
-    return category_course_map.get(predicted_category, [])
+
+    # Fallback recommendation (in case category not found)
+    fallback_courses = ds_course + web_course + ai_course
+    return category_course_map.get(predicted_category, fallback_courses)
+
+
+import re
 
 def filter_jobs_by_category(jobs, predicted_category):
-    """Filter jobs to show only relevant ones based on predicted category"""
+    """
+    Filter and rank jobs based on how relevant they are to the predicted career category.
+    Uses weighted keyword matching (core vs related), fuzzy matching, and adaptive fallback.
+    """
+
     if not predicted_category or not jobs:
         return jobs
-    
-    # Category-to-keyword mapping for job filtering
-    # Core keywords (high priority) + related keywords (medium priority)
+
+    # ========== SMART FUZZY MATCHER ==========
+    def keyword_in_text(keyword, text):
+        """Smart matching for plural, hyphen, spacing variations"""
+        pattern = r'\b' + re.escape(keyword).replace(r'\-', '[-\s]?') + r's?\b'
+        return re.search(pattern, text, re.IGNORECASE)
+
+    # ========== CATEGORY KEYWORDS ==========
     category_keywords = {
+        # --- Core Developer Roles ---
         'Java Developer': {
             'core': ['java', 'spring', 'jvm', 'kotlin'],
-            'related': ['backend', 'software', 'developer', 'engineer', 'programming']
+            'related': ['backend', 'software', 'developer', 'engineer']
         },
         'Python Developer': {
             'core': ['python', 'django', 'flask'],
-            'related': ['backend', 'software', 'developer', 'engineer', 'programming']
-        },
-        'Data Science': {
-            'core': ['data', 'analyst', 'analysis', 'analytics', 'science'],
-            'related': ['scientist', 'machine learning', 'ml', 'ai', 'insight', 'business intelligence', 'bi', 'excel', 'tableau', 'power bi']
+            'related': ['backend', 'software', 'developer', 'ai', 'ml']
         },
         'Web Designing': {
-            'core': ['web', 'design', 'ui', 'ux', 'frontend'],
-            'related': ['react', 'angular', 'vue', 'designer', 'creative', 'html', 'css']
+            'core': ['web', 'frontend', 'ui', 'ux', 'html', 'css'],
+            'related': ['react', 'angular', 'vue', 'javascript', 'designer']
         },
+        'Full Stack Developer': {
+            'core': ['full stack', 'mern', 'mean', 'frontend', 'backend'],
+            'related': ['react', 'node', 'express', 'django', 'api']
+        },
+        'Android Developer': {
+            'core': ['android', 'kotlin', 'java', 'mobile'],
+            'related': ['flutter', 'compose']
+        },
+        'iOS Developer': {
+            'core': ['ios', 'swift', 'swiftui', 'xcode'],
+            'related': ['mobile', 'app', 'developer']
+        },
+
+        # --- Data & AI ---
+        'Data Science': {
+            'core': ['data', 'scientist', 'analytics', 'analysis'],
+            'related': ['machine learning', 'ml', 'ai', 'insight', 'python', 'sql']
+        },
+        'Machine Learning Engineer': {
+            'core': ['machine learning', 'ml', 'ai', 'neural'],
+            'related': ['pytorch', 'tensorflow', 'deep learning']
+        },
+        'AI Engineer': {
+            'core': ['ai', 'artificial intelligence', 'ml', 'deep learning'],
+            'related': ['llm', 'nlp', 'vision', 'transformer']
+        },
+        'Data Engineer': {
+            'core': ['data engineer', 'pipeline', 'etl', 'big data'],
+            'related': ['airflow', 'spark', 'hadoop', 'aws glue', 'kafka']
+        },
+        'Business Analyst': {
+            'core': ['business analyst', 'data', 'requirements', 'insights'],
+            'related': ['excel', 'tableau', 'power bi']
+        },
+
+        # --- Cloud & DevOps ---
         'DevOps Engineer': {
-            'core': ['devops', 'cloud', 'aws', 'azure', 'kubernetes', 'docker'],
-            'related': ['gcp', 'sre', 'infrastructure', 'engineer', 'ci/cd']
+            'core': ['devops', 'ci/cd', 'docker', 'kubernetes'],
+            'related': ['aws', 'azure', 'gcp', 'infrastructure', 'terraform']
         },
-        'HR': {
-            'core': ['hr', 'human resource', 'recruitment'],
-            'related': ['talent', 'recruiter', 'people']
+        'Cloud Engineer': {
+            'core': ['cloud', 'aws', 'azure', 'gcp', 'infrastructure'],
+            'related': ['devops', 'serverless', 'kubernetes', 'docker']
         },
-        'Testing': {
-            'core': ['test', 'qa', 'quality', 'automation'],
-            'related': ['selenium', 'software', 'engineer']
+        'Site Reliability Engineer': {
+            'core': ['sre', 'reliability', 'monitoring'],
+            'related': ['devops', 'cloud', 'automation']
         },
+
+        # --- Cybersecurity ---
+        'Network Security Engineer': {
+            'core': ['network', 'security', 'cyber'],
+            'related': ['infosec', 'pentesting', 'firewall', 'ethical hacking']
+        },
+        'Cybersecurity Analyst': {
+            'core': ['cybersecurity', 'security analyst', 'threat', 'incident'],
+            'related': ['vulnerability', 'forensics', 'malware', 'siem']
+        },
+        'Ethical Hacker': {
+            'core': ['ethical hacker', 'pentest', 'penetration testing'],
+            'related': ['bug bounty', 'offensive security', 'owasp']
+        },
+
+        # --- Blockchain & Web3 ---
+        'Blockchain Developer': {
+            'core': ['blockchain', 'web3', 'solidity', 'crypto'],
+            'related': ['ethereum', 'smart contract', 'defi']
+        },
+        'Web3 Developer': {
+            'core': ['web3', 'blockchain', 'solidity'],
+            'related': ['dapp', 'nft', 'crypto']
+        },
+
+        # --- UI/UX & Creative ---
+        'UI/UX Designer': {
+            'core': ['ui', 'ux', 'figma', 'design'],
+            'related': ['prototype', 'wireframe', 'adobe', 'user research']
+        },
+
+        # --- Other Tech Roles ---
         'Database': {
             'core': ['database', 'dba', 'sql'],
-            'related': ['oracle', 'mongodb', 'data', 'mysql', 'postgresql']
+            'related': ['oracle', 'mongodb', 'mysql', 'postgresql']
         },
-        'Blockchain': {
-            'core': ['blockchain', 'crypto', 'web3'],
-            'related': ['smart contract', 'ethereum', 'developer']
-        },
-        'Operations Manager': {
-            'core': ['operations', 'manager', 'management'],
-            'related': ['project', 'business']
+        'Testing': {
+            'core': ['testing', 'qa', 'quality', 'automation'],
+            'related': ['selenium', 'software', 'engineer']
         },
         'SAP Developer': {
             'core': ['sap', 'erp'],
-            'related': ['developer']
+            'related': ['developer', 'abap']
         },
-        'Mechanical Engineer': {
-            'core': ['mechanical', 'engineer'],
-            'related': ['manufacturing', 'cad', 'design']
-        },
-        'Civil Engineer': {
-            'core': ['civil', 'construction'],
-            'related': ['structural', 'engineer']
-        },
-        'Electrical Engineering': {
-            'core': ['electrical', 'electronics', 'embedded'],
-            'related': ['hardware', 'engineer']
-        },
-        'Network Security Engineer': {
-            'core': ['network', 'security', 'cyber'],
-            'related': ['infosec', 'pentesting', 'engineer']
+        'Operations Manager': {
+            'core': ['operations', 'manager'],
+            'related': ['project', 'business', 'process']
         },
     }
-    
-    # Get keywords for the predicted category
+
+    # ========== GET CATEGORY KEYWORDS ==========
     keyword_set = category_keywords.get(predicted_category, {})
     core_keywords = keyword_set.get('core', [])
     related_keywords = keyword_set.get('related', [])
-    
-    # If no keywords, return all jobs
+
     if not core_keywords and not related_keywords:
-        return jobs
-    
-    # Filter jobs with scoring (weighted: core = 3 points, related = 1 point)
+        return jobs  # no filtering if unknown category
+
+    # ========== FILTER & SCORE JOBS ==========
     scored_jobs = []
+
     for job in jobs:
-        title = (job.get('title', '') or '').lower()
-        description = (job.get('description', '') or '').lower()
+        title = (job.get('title', '') or '').lower().replace('-', ' ')
+        description = (job.get('description', '') or '').lower().replace('-', ' ')
         company = (job.get('company', '') or '').lower()
         tags = ' '.join(job.get('tags', [])).lower()
-        
-        # Title is most important
-        title_score = 0
+        job_text = f"{title} {description} {company} {tags}"
+
+        title_score, body_score = 0, 0
+
+        # --- Score titles ---
         for keyword in core_keywords:
-            if keyword in title:
-                title_score += 5  # Very high weight for core keyword in title
+            if keyword_in_text(keyword, title):
+                title_score += 5
         for keyword in related_keywords:
-            if keyword in title:
-                title_score += 2  # Medium weight for related keyword in title
-        
-        # Description and other fields
-        job_text = f"{description} {company} {tags}"
-        body_score = 0
+            if keyword_in_text(keyword, title):
+                title_score += 2
+
+        # --- Score description, company, tags ---
         for keyword in core_keywords:
-            if keyword in job_text:
+            if keyword_in_text(keyword, job_text):
                 body_score += 3
         for keyword in related_keywords:
-            if keyword in job_text:
+            if keyword_in_text(keyword, job_text):
                 body_score += 1
-        
+
         total_score = title_score + body_score
-        
-        # Keep job if it has at least one core keyword OR good title match
-        has_core = any(kw in title or kw in job_text for kw in core_keywords)
-        has_strong_title = title_score >= 2
-        
-        if has_core or has_strong_title or total_score >= 3:
+
+        has_core = any(keyword_in_text(kw, job_text) for kw in core_keywords)
+        has_strong_title = title_score >= 3
+
+        if has_core or has_strong_title or total_score >= 4:
             scored_jobs.append((job, total_score))
-    
-    # Sort by match score (highest first)
+
+    # ========== SORT & FALLBACK ==========
     scored_jobs.sort(key=lambda x: x[1], reverse=True)
     filtered_jobs = [job for job, score in scored_jobs]
-    
-    # If filtering removed MORE than 85% of jobs, return original list (too strict)
-    if len(filtered_jobs) < len(jobs) * 0.15:
+
+    # If filtering removes too many jobs, fallback to original list
+    if len(filtered_jobs) < max(3, len(jobs) * 0.2):
         return jobs
-    
+
     return filtered_jobs if filtered_jobs else jobs
+
 
 # -----------------------------
 # Application Setup
