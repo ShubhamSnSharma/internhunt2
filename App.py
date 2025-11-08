@@ -1257,10 +1257,6 @@ def display_job_recommendations_dual(skills_list, keywords_text: str, location_t
     # Jooble-specific location input (placed before fetch to avoid unbound errors)
     jooble_loc = st.text_input("Jooble Location", value=(location_text or ""), key="jooble_location_input")
     jooble_fetch = st.button("Search Jooble", key="jooble_search_btn")
-
-    # Show what we're searching for (helps with debugging)
-    if predicted_category:
-        st.info(f"🎯 Searching for **{predicted_category}** internships using keywords: '{query_str}'")
     
     # Fetch both sources concurrently (Jooble + Internshala scraper)
     with st.spinner("Fetching opportunities..."):
@@ -1332,6 +1328,11 @@ def display_job_recommendations_dual(skills_list, keywords_text: str, location_t
         """,
         unsafe_allow_html=True,
     )
+    
+    # Show what we're searching for (helps with debugging)
+    if predicted_category:
+        st.info(f"🎯 Searching for **{predicted_category}** internships using keywords: '{query_str}'")
+    
     # Separate Internshala keyword + location inputs
     c_ik, c_il, c_ib = st.columns([3, 2, 1])
     with c_ik:
@@ -1707,17 +1708,6 @@ def display_job_card(job, source):
     ''', unsafe_allow_html=True)
     
     st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Bonus: bottom-right source tag (subtle)
-    st.markdown(
-        f"""
-        <div style="display:flex; justify-content:flex-end; margin-top:6px;">
-            <span style="font-size:11px; color:#9ca3af; background:rgba(255,255,255,0.04); border:1px solid #374151; padding:2px 8px; border-radius:999px;">{source_name}</span>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
     st.markdown('</div>', unsafe_allow_html=True)
 
 def course_recommender(course_list):
