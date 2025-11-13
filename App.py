@@ -672,163 +672,276 @@ def _load_nevera_font():
 
 def display_header():
     """Display professional application header with ultra-modern design"""
+    # Apply animations
     st.markdown(StyleManager.get_animation_styles(), unsafe_allow_html=True)
     
+    # Theme toggle in sidebar for cleaner header
     with st.sidebar:
         theme = st.toggle("🌙 Dark Mode" if st.session_state.theme_mode == "light" else "☀️ Light Mode")
         st.session_state.theme_mode = "light" if theme else "dark"
         StyleManager.apply_theme_styles(st.session_state.theme_mode)
     
+    # Load font inline
     font_b64 = _load_nevera_font()
     
+    # Ultra-professional header with modern design  
     st.markdown(f"""
     <style>
-    /* Reset and Base Styles */
-    .stApp {{
-        overflow: hidden;
+    /* ---------------- CUSTOM FONT ---------------- */
+    @font-face {{
+        font-family: 'Nevera';
+        src: url('data:application/x-font-opentype;base64,{font_b64}') format('opentype'),
+             url('data:font/otf;base64,{font_b64}') format('opentype');
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
     }}
     
-    /* Hero Container */
+    /* ---------------- HERO SECTION ---------------- */
     .hero-section {{
         position: relative;
         background: radial-gradient(120% 160% at 50% 10%, #0e132a 20%, #0b1028 100%);
-        padding: 80px 20px;
+        padding: 100px 20px 120px;
         text-align: center;
         border-radius: 20px;
         overflow: hidden;
         box-shadow: 0 8px 40px rgba(0,0,0,0.25);
-        margin: 0 auto;
-        max-width: 1200px;
-        width: 100%;
-        box-sizing: border-box;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }}
 
-    /* Content Wrapper */
-    .hero-content {{
-        position: relative;
-        z-index: 2;
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 0 20px;
+    .hero-section:hover {{
+        transform: scale(1.005);
+        box-shadow: 0 12px 45px rgba(0,0,0,0.3);
     }}
 
-    /* Badge */
+    /* Subtle background animation with moving gradient */
+    .hero-section::before {{
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(120deg, rgba(124,58,237,0.1), rgba(45,212,191,0.1), rgba(124,58,237,0.1), rgba(45,212,191,0.1));
+        background-size: 200% 200%;
+        animation: moveGradient 10s ease-in-out infinite alternate;
+        z-index: 0;
+    }}
+
+    @keyframes moveGradient {{
+        0%% {{ background-position: 0% 50%; }}
+        100%% {{ background-position: 100% 50%; }}
+    }}
+
+    /* Glow halo */
+    .hero-section::after {{
+        content: "";
+        position: absolute;
+        top: -150px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 1000px;
+        height: 1000px;
+        background: radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.1), rgba(99, 102, 241, 0.05) 70%, transparent 100%);
+        filter: blur(120px);
+        z-index: 0;
+        animation: pulseGlow 8s ease-in-out infinite alternate;
+    }}
+
+    @keyframes pulseGlow {{
+        0%% {{ opacity: 0.8; transform: translateX(-50%) scale(1); }}
+        100%% {{ opacity: 1; transform: translateX(-50%) scale(1.08); }}
+    }}
+
+    /* ============ UNIFIED ANIMATIONS ============ */
+    /* Smooth fade-up animation with cubic-bezier easing */
+    @keyframes fadeUp {{
+        0%% {{ opacity: 0; transform: translateY(40px); }}
+        100%% {{ opacity: 1; transform: translateY(0); }}
+    }}
+
+    /* ---------------- TEXT STYLING ---------------- */
     .hero-badge {{
         display: inline-block;
         background: rgba(99,102,241,0.15);
         border: 1px solid rgba(99,102,241,0.3);
+        box-shadow: inset 0 0 10px rgba(255,255,255,0.05);
+        backdrop-filter: blur(15px);
         color: #a5b4fc;
         padding: 8px 20px;
         border-radius: 50px;
         font-family: 'Inter', sans-serif;
         font-size: 0.9rem;
         font-weight: 500;
-        margin-bottom: 20px;
+        margin-bottom: 28px;
         letter-spacing: 0.5px;
+        text-shadow: 0 0 10px rgba(165,180,252,0.3);
+        animation: fadeUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        z-index: 2;
     }}
-
-    /* Branding */
+    
     .hero-branding {{
-        font-family: 'Nevera', sans-serif;
-        font-size: 4.5rem;
+        font-family: 'Nevera', 'Helvetica Neue', Arial, sans-serif !important;
+        font-size: 5.5rem;
         font-weight: 400;
         color: #fff;
-        margin: 10px 0;
-        letter-spacing: 0.1em;
-        line-height: 1.1;
+        margin-bottom: 25px;
+        margin-top: 20px;
+        letter-spacing: 0.18em;
+        animation: fadeUp 1s cubic-bezier(0.4, 0, 0.2, 1), gradientFlow 6s ease-in-out infinite alternate;
+        position: relative;
+        z-index: 2;
+        text-transform: uppercase;
+        font-feature-settings: 'kern' 1;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
         background: linear-gradient(100deg, #8b5cf6, #2dd4bf, #38bdf8, #8b5cf6);
         background-size: 200% 200%;
         -webkit-background-clip: text;
-        background-clip: text;
         -webkit-text-fill-color: transparent;
-        text-transform: uppercase;
+        background-clip: text;
     }}
 
-    /* Title */
+    @keyframes gradientFlow {{
+        0%% {{ background-position: 0% 50%; }}
+        100%% {{ background-position: 100% 50%; }}
+    }}
+
     .hero-title {{
         font-family: 'Inter', sans-serif;
-        font-size: 2.5rem;
+        font-size: 2.8rem;
         font-weight: 700;
         color: #f1f5f9;
-        margin: 20px 0;
+        margin-bottom: 20px;
         line-height: 1.2;
+        letter-spacing: -0.02em;
+        animation: fadeUp 1.1s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        z-index: 2;
     }}
 
     .hero-title span {{
+        color: #2cb67d;
         background: linear-gradient(135deg, #7f5af0, #2cb67d);
         -webkit-background-clip: text;
-        background-clip: text;
         -webkit-text-fill-color: transparent;
+        background-clip: text;
     }}
 
-    /* Description */
     .hero-desc {{
         font-family: 'Inter', sans-serif;
-        font-size: 1.1rem;
-        color: #94a3b8;
+        font-size: 1.05rem;
+        font-weight: 400;
+        color: var(--text-muted);
         max-width: 700px;
-        margin: 0 auto 30px;
+        margin: 0 auto;
         line-height: 1.6;
+        letter-spacing: 0.01em;
+        animation: fadeUp 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        z-index: 2;
     }}
 
-    /* CTA Button */
+    /* ---------------- CTA BUTTON ---------------- */
+    .hero-cta {{
+        text-align: center;
+        margin-top: 32px;
+    }}
+
     .cta-button {{
         display: inline-block;
-        padding: 12px 32px;
+        margin-top: 32px;
+        padding: 14px 36px;
         background: linear-gradient(135deg, #6366f1, #14b8a6);
         border: none;
         border-radius: 50px;
         color: white;
         font-family: 'Inter', sans-serif;
         font-weight: 600;
-        font-size: 1rem;
         text-decoration: none;
-        transition: all 0.3s ease;
+        box-shadow: 0 8px 20px rgba(99,102,241,0.3);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease-in-out;
+        cursor: pointer;
+        font-size: 1.05rem;
+        letter-spacing: 0.02em;
+        animation: fadeUp 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }}
+    
+    .cta-button::before {{
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s ease;
+    }}
+    
+    .cta-button:hover::before {{
+        left: 100%;
     }}
 
     .cta-button:hover {{
         transform: translateY(-2px);
         box-shadow: 0 12px 30px rgba(99,102,241,0.5);
     }}
+    
+    .cta-button:active {{
+        transform: translateY(0px);
+        box-shadow: 0 4px 15px rgba(99,102,241,0.4);
+    }}
 
-    /* Responsive Adjustments */
+    /* Scroll target for upload section */
+    #upload-section {{
+        scroll-margin-top: 20px;
+    }}
+
+    /* ---------------- RESPONSIVE DESIGN ---------------- */
     @media (max-width: 1024px) {{
-        .hero-branding { font-size: 3.5rem; }
-        .hero-title { font-size: 2rem; }
+        .hero-section {{ padding: 80px 20px 100px; }}
+        .hero-branding {{ font-size: 4rem; }}
+        .hero-title {{ font-size: 2.1rem; line-height: 1.2; }}
+        .hero-desc {{ font-size: 1rem; max-width: 600px; line-height: 1.6; }}
+        .hero-badge {{ font-size: 0.85rem; }}
+        .cta-button {{ font-size: 1rem; padding: 12px 32px; }}
     }}
 
     @media (max-width: 768px) {{
-        .hero-section {{
-            border-radius: 0;
-            padding: 60px 15px;
-        }}
-        .hero-branding { font-size: 2.5rem; }
-        .hero-title { font-size: 1.75rem; }
-        .hero-desc { font-size: 1rem; padding: 0 10px; }
+        .hero-section {{ padding: 60px 16px 80px; }}
+        .hero-branding {{ font-size: 3rem; letter-spacing: 0.12em; }}
+        .hero-title {{ font-size: 1.7rem; line-height: 1.25; }}
+        .hero-desc {{ font-size: 0.95rem; max-width: 100%; padding: 0 10px; line-height: 1.6; }}
+        .hero-badge {{ font-size: 0.8rem; padding: 6px 16px; }}
+        .cta-button {{ font-size: 0.95rem; padding: 12px 28px; margin-top: 24px; }}
     }}
 
     @media (max-width: 480px) {{
-        .hero-branding { font-size: 2rem; }
-        .hero-title { font-size: 1.5rem; }
-        .hero-desc { font-size: 0.95rem; }
-        .hero-badge { font-size: 0.8rem; }
+        .hero-section {{ padding: 50px 12px 70px; }}
+        .hero-branding {{ font-size: 2.2rem; }}
+        .hero-title {{ font-size: 1.6rem; line-height: 1.3; }}
+        .hero-desc {{ font-size: 0.9rem; line-height: 1.6; }}
+        .hero-badge {{ font-size: 0.75rem; padding: 5px 14px; }}
     }}
     </style>
 
+    <!-- HERO SECTION -->
     <div class="hero-section">
-        <div class="hero-content">
-            <div class="hero-badge">⚡ AI-Powered Internship Matching</div>
-            <div class="hero-branding">INTERNHUNT</div>
-            <h1 class="hero-title">Find Internships That <span>Fit You</span></h1>
-            <p class="hero-desc">
-                Upload your resume and let our AI analyze your skills, experience, and preferences 
-                to match you with the perfect internship opportunities. 
-                Smart recommendations powered by advanced machine learning.
-            </p>
+        <div class="hero-badge">⚡ AI-Powered Internship Matching</div>
+        <div class="hero-branding">INTERNHUNT</div>
+        <h1 class="hero-title">Find Internships That <span>Fit You</span></h1>
+        <p class="hero-desc">
+            Upload your resume and let our AI analyze your skills, experience, and preferences 
+            to match you with the perfect internship opportunities. 
+            Smart recommendations powered by advanced machine learning.
+        </p>
+        <div class="hero-cta">
             <a href="#upload-section" class="cta-button">Upload Resume</a>
         </div>
     </div>
-    """, unsafe_allow_html=True)
+""", unsafe_allow_html=True)
+
 
 def get_table_download_link(df, filename, text):
     """Generate download link for dataframe"""
