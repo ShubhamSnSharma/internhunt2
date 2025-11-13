@@ -701,20 +701,17 @@ def display_header():
     .hero-section {{
         position: relative;
         background: radial-gradient(120% 160% at 50% 10%, #0e132a 20%, #0b1028 100%);
-        padding: 100px 20px 120px;
+        padding: clamp(60px, 10vw, 100px) 20px clamp(80px, 12vw, 120px);
         text-align: center;
         border-radius: 20px;
         overflow: hidden;
         box-shadow: 0 8px 40px rgba(0,0,0,0.25);
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        margin: 0 auto;
+        max-width: 1400px;
+        width: calc(100% - 40px);
+        box-sizing: border-box;
     }}
 
-    .hero-section:hover {{
-        transform: scale(1.005);
-        box-shadow: 0 12px 45px rgba(0,0,0,0.3);
-    }}
-
-    /* Subtle background animation with moving gradient */
     .hero-section::before {{
         content: "";
         position: absolute;
@@ -726,38 +723,33 @@ def display_header():
     }}
 
     @keyframes moveGradient {{
-        0%% {{ background-position: 0% 50%; }}
-        100%% {{ background-position: 100% 50%; }}
+        0% {{ background-position: 0% 50%; }}
+        100% {{ background-position: 100% 50%; }}
     }}
 
-    /* Glow halo */
     .hero-section::after {{
         content: "";
         position: absolute;
         top: -150px;
         left: 50%;
         transform: translateX(-50%);
-        width: 1000px;
-        height: 1000px;
+        width: min(1000px, 100vw);
+        height: min(1000px, 100vw);
         background: radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.1), rgba(99, 102, 241, 0.05) 70%, transparent 100%);
         filter: blur(120px);
         z-index: 0;
         animation: pulseGlow 8s ease-in-out infinite alternate;
     }}
 
-    @keyframes pulseGlow {{
-        0%% {{ opacity: 0.8; transform: translateX(-50%) scale(1); }}
-        100%% {{ opacity: 1; transform: translateX(-50%) scale(1.08); }}
+    .hero-content {{
+        position: relative;
+        z-index: 2;
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 20px;
+        box-sizing: border-box;
     }}
 
-    /* ============ UNIFIED ANIMATIONS ============ */
-    /* Smooth fade-up animation with cubic-bezier easing */
-    @keyframes fadeUp {{
-        0%% {{ opacity: 0; transform: translateY(40px); }}
-        100%% {{ opacity: 1; transform: translateY(0); }}
-    }}
-
-    /* ---------------- TEXT STYLING ---------------- */
     .hero-badge {{
         display: inline-block;
         background: rgba(99,102,241,0.15);
@@ -768,58 +760,44 @@ def display_header():
         padding: 8px 20px;
         border-radius: 50px;
         font-family: 'Inter', sans-serif;
-        font-size: 0.9rem;
+        font-size: clamp(0.8rem, 1.5vw, 0.9rem);
         font-weight: 500;
-        margin-bottom: 28px;
+        margin-bottom: clamp(20px, 3vw, 28px);
         letter-spacing: 0.5px;
         text-shadow: 0 0 10px rgba(165,180,252,0.3);
         animation: fadeUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        z-index: 2;
     }}
     
     .hero-branding {{
         font-family: 'Nevera', 'Helvetica Neue', Arial, sans-serif !important;
-        font-size: 5.5rem;
+        font-size: clamp(2.5rem, 8vw, 5.5rem);
         font-weight: 400;
         color: #fff;
-        margin-bottom: 25px;
-        margin-top: 20px;
+        margin: 0.5em 0 0.3em;
         letter-spacing: 0.18em;
-        animation: fadeUp 1s cubic-bezier(0.4, 0, 0.2, 1), gradientFlow 6s ease-in-out infinite alternate;
-        position: relative;
-        z-index: 2;
         text-transform: uppercase;
-        font-feature-settings: 'kern' 1;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
+        line-height: 1.1;
         background: linear-gradient(100deg, #8b5cf6, #2dd4bf, #38bdf8, #8b5cf6);
         background-size: 200% 200%;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-    }}
-
-    @keyframes gradientFlow {{
-        0%% {{ background-position: 0% 50%; }}
-        100%% {{ background-position: 100% 50%; }}
+        text-fill-color: transparent;
+        animation: gradientFlow 6s ease-in-out infinite alternate;
     }}
 
     .hero-title {{
         font-family: 'Inter', sans-serif;
-        font-size: 2.8rem;
+        font-size: clamp(1.8rem, 4vw, 2.8rem);
         font-weight: 700;
         color: #f1f5f9;
-        margin-bottom: 20px;
+        margin: 0.5em 0;
         line-height: 1.2;
         letter-spacing: -0.02em;
-        animation: fadeUp 1.1s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        z-index: 2;
+        padding: 0 10px;
     }}
 
     .hero-title span {{
-        color: #2cb67d;
         background: linear-gradient(135deg, #7f5af0, #2cb67d);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
@@ -828,120 +806,98 @@ def display_header():
 
     .hero-desc {{
         font-family: 'Inter', sans-serif;
-        font-size: 1.05rem;
+        font-size: clamp(0.95rem, 1.5vw, 1.05rem);
         font-weight: 400;
-        color: var(--text-muted);
+        color: #94a3b8;
         max-width: 700px;
         margin: 0 auto;
         line-height: 1.6;
         letter-spacing: 0.01em;
-        animation: fadeUp 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        z-index: 2;
+        padding: 0 10px;
     }}
 
-    /* ---------------- CTA BUTTON ---------------- */
     .hero-cta {{
-        text-align: center;
-        margin-top: 32px;
+        margin-top: clamp(24px, 4vw, 32px);
     }}
 
     .cta-button {{
         display: inline-block;
-        margin-top: 32px;
-        padding: 14px 36px;
+        padding: clamp(12px, 1.5vw, 14px) clamp(28px, 3vw, 36px);
         background: linear-gradient(135deg, #6366f1, #14b8a6);
         border: none;
         border-radius: 50px;
         color: white;
         font-family: 'Inter', sans-serif;
         font-weight: 600;
+        font-size: clamp(0.95rem, 1.5vw, 1.05rem);
         text-decoration: none;
         box-shadow: 0 8px 20px rgba(99,102,241,0.3);
-        backdrop-filter: blur(10px);
-        transition: all 0.3s ease-in-out;
-        cursor: pointer;
-        font-size: 1.05rem;
-        letter-spacing: 0.02em;
-        animation: fadeUp 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all 0.3s ease;
         position: relative;
         overflow: hidden;
-    }}
-    
-    .cta-button::before {{
-        content: "";
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-        transition: left 0.5s ease;
-    }}
-    
-    .cta-button:hover::before {{
-        left: 100%;
+        cursor: pointer;
     }}
 
     .cta-button:hover {{
         transform: translateY(-2px);
         box-shadow: 0 12px 30px rgba(99,102,241,0.5);
     }}
-    
+
     .cta-button:active {{
-        transform: translateY(0px);
-        box-shadow: 0 4px 15px rgba(99,102,241,0.4);
+        transform: translateY(0);
     }}
 
-    /* Scroll target for upload section */
-    #upload-section {{
-        scroll-margin-top: 20px;
-    }}
-
-    /* ---------------- RESPONSIVE DESIGN ---------------- */
-    @media (max-width: 1024px) {{
-        .hero-section {{ padding: 80px 20px 100px; }}
-        .hero-branding {{ font-size: 4rem; }}
-        .hero-title {{ font-size: 2.1rem; line-height: 1.2; }}
-        .hero-desc {{ font-size: 1rem; max-width: 600px; line-height: 1.6; }}
-        .hero-badge {{ font-size: 0.85rem; }}
-        .cta-button {{ font-size: 1rem; padding: 12px 32px; }}
-    }}
-
+    /* Responsive adjustments */
     @media (max-width: 768px) {{
-        .hero-section {{ padding: 60px 16px 80px; }}
-        .hero-branding {{ font-size: 3rem; letter-spacing: 0.12em; }}
-        .hero-title {{ font-size: 1.7rem; line-height: 1.25; }}
-        .hero-desc {{ font-size: 0.95rem; max-width: 100%; padding: 0 10px; line-height: 1.6; }}
-        .hero-badge {{ font-size: 0.8rem; padding: 6px 16px; }}
-        .cta-button {{ font-size: 0.95rem; padding: 12px 28px; margin-top: 24px; }}
+        .hero-section {{
+            border-radius: 0;
+            width: 100%;
+            max-width: 100%;
+        }}
+        
+        .hero-branding {{
+            letter-spacing: 0.1em;
+        }}
+        
+        .hero-desc {{
+            padding: 0 5px;
+        }}
     }}
 
-    @media (max-width: 480px) {{
-        .hero-section {{ padding: 50px 12px 70px; }}
-        .hero-branding {{ font-size: 2.2rem; }}
-        .hero-title {{ font-size: 1.6rem; line-height: 1.3; }}
-        .hero-desc {{ font-size: 0.9rem; line-height: 1.6; }}
-        .hero-badge {{ font-size: 0.75rem; padding: 5px 14px; }}
+    /* Animation keyframes */
+    @keyframes fadeUp {{
+        from {{ opacity: 0; transform: translateY(20px); }}
+        to {{ opacity: 1; transform: translateY(0); }}
+    }}
+
+    @keyframes gradientFlow {{
+        0% {{ background-position: 0% 50%; }}
+        100% {{ background-position: 100% 50%; }}
+    }}
+
+    @keyframes pulseGlow {{
+        0% {{ opacity: 0.8; transform: translateX(-50%) scale(1); }}
+        100% {{ opacity: 1; transform: translateX(-50%) scale(1.08); }}
     }}
     </style>
 
     <!-- HERO SECTION -->
     <div class="hero-section">
-        <div class="hero-badge">⚡ AI-Powered Internship Matching</div>
-        <div class="hero-branding">INTERNHUNT</div>
-        <h1 class="hero-title">Find Internships That <span>Fit You</span></h1>
-        <p class="hero-desc">
-            Upload your resume and let our AI analyze your skills, experience, and preferences 
-            to match you with the perfect internship opportunities. 
-            Smart recommendations powered by advanced machine learning.
-        </p>
-        <div class="hero-cta">
-            <a href="#upload-section" class="cta-button">Upload Resume</a>
+        <div class="hero-content">
+            <div class="hero-badge">⚡ AI-Powered Internship Matching</div>
+            <div class="hero-branding">INTERNHUNT</div>
+            <h1 class="hero-title">Find Internships That <span>Fit You</span></h1>
+            <p class="hero-desc">
+                Upload your resume and let our AI analyze your skills, experience, and preferences 
+                to match you with the perfect internship opportunities. 
+                Smart recommendations powered by advanced machine learning.
+            </p>
+            <div class="hero-cta">
+                <a href="#upload-section" class="cta-button">Upload Resume</a>
+            </div>
         </div>
     </div>
 """, unsafe_allow_html=True)
-
 
 def get_table_download_link(df, filename, text):
     """Generate download link for dataframe"""
