@@ -828,14 +828,15 @@ def display_header():
 
     .hero-desc {{
         font-family: 'Inter', sans-serif;
-        font-size: 1.05rem;
+        font-size: 1.1rem;
         font-weight: 400;
-        color: var(--text-muted);
+        color: #94a3b8;
         max-width: 700px;
-        margin: 0 auto;
-        line-height: 1.6;
+        margin: 0 auto 30px;
+        line-height: 1.7;
         letter-spacing: 0.01em;
-        animation: fadeUp 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 0 10px;
+        text-align: center;
         position: relative;
         z-index: 2;
     }}
@@ -932,9 +933,7 @@ def display_header():
         <div class="hero-branding">INTERNHUNT</div>
         <h1 class="hero-title">Find Internships That <span>Fit You</span></h1>
         <p class="hero-desc">
-            Upload your resume and let our AI analyze your skills, experience, and preferences 
-            to match you with the perfect internship opportunities. 
-            Smart recommendations powered by advanced machine learning.
+            Upload your resume and let our AI analyze your skills, experience, and preferences to match you with the perfect internship opportunities. Smart recommendations powered by advanced machine learning.
         </p>
         <div class="hero-cta">
             <a href="#upload-section" class="cta-button">Upload Resume</a>
