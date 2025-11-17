@@ -675,11 +675,10 @@ def display_header():
     # Apply animations
     st.markdown(StyleManager.get_animation_styles(), unsafe_allow_html=True)
     
-    # Theme toggle in sidebar for cleaner header
-    with st.sidebar:
-        theme = st.toggle("🌙 Dark Mode" if st.session_state.theme_mode == "light" else "☀️ Light Mode")
-        st.session_state.theme_mode = "light" if theme else "dark"
-        StyleManager.apply_theme_styles(st.session_state.theme_mode)
+    # Apply default light theme
+    if 'theme_mode' not in st.session_state:
+        st.session_state.theme_mode = 'light'
+        StyleManager.apply_theme_styles('light')
     
     # Load font inline
     font_b64 = _load_nevera_font()
