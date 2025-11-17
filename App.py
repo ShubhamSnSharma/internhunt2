@@ -932,9 +932,6 @@ def display_header():
         <div class="hero-badge">⚡ AI-Powered Internship Matching</div>
         <div class="hero-branding">INTERNHUNT</div>
         <h1 class="hero-title">Find Internships That <span>Fit You</span></h1>
-        <p class="hero-desc">
-            Upload your resume and let our AI analyze your skills, experience, and preferences to match you with the perfect internship opportunities. Smart recommendations powered by advanced machine learning.
-        </p>
         <div class="hero-cta">
             <a href="#upload-section" class="cta-button">Upload Resume</a>
         </div>
