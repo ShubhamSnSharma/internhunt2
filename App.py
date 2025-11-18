@@ -3619,7 +3619,8 @@ def main():
                     # --- Prepare variables ---
                     sp = components.get('sections_presence') or {}
                     top_skills = (resume_data.get('skills') or [])[:3]
-                    role_for_tpl = role if role != 'Auto-detect' else (components.get('kw_role_alignment_role') or 'Software Engineer')
+                    # Use auto-detected role by default
+                    role = components.get('kw_role_alignment_role') or 'Software Engineer'
                     role_skills = ', '.join(top_skills) if top_skills else 'relevant tools/skills'
 
                     # --- Work Experience Template (correct HTML, no stray closing tags inside content) ---
