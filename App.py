@@ -3621,6 +3621,7 @@ def main():
                     top_skills = (resume_data.get('skills') or [])[:3]
                     # Use auto-detected role by default
                     role = components.get('kw_role_alignment_role') or 'Software Engineer'
+                    role_for_tpl = role  # Define role_for_tpl for template usage
                     role_skills = ', '.join(top_skills) if top_skills else 'relevant tools/skills'
 
                     # --- Work Experience Template (correct HTML, no stray closing tags inside content) ---
