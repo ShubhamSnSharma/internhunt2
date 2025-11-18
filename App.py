@@ -2748,16 +2748,8 @@ def main():
                 </style>
                 """, unsafe_allow_html=True)
                 
-                # Allow user to pick a target role to improve role alignment
-                role = st.sidebar.selectbox(
-                    "Target role (for ATS alignment)",
-                    ["Auto-detect", "Software Engineer", "Data Analyst", "Web Developer", "Machine Learning Engineer"],
-                    index=0,
-                    key="target_role_select"
-                )
+                # Default role is auto-detect
                 _resume_for_score = dict(resume_data)
-                if role != "Auto-detect":
-                    _resume_for_score["target_role"] = role
                 breakdown = AnalyticsUtils.calculate_resume_score_breakdown(_resume_for_score)
                 score = breakdown.get("total", 0)
                 components = breakdown.get("components", {})
