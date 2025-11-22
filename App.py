@@ -2420,10 +2420,7 @@ def main():
         </style>
         <div class='sidebar-footer'>
             © 2025 InternHunt <br>
-            Developed by 
-            <a href='https://shubhamsn.vercel.app' target='_blank'>Shubham</a>, 
-            <a href='https://www.linkedin.com/in/abhinav-ghangas-5a3b8128a' target='_blank'>Abhinav</a>, 
-            <a href='https://www.linkedin.com/in/pragya-9974b1298' target='_blank'>Pragya</a>
+            Crafted with ❤️ by Students
         </div>
         """, unsafe_allow_html=True)
         
