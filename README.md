@@ -339,42 +339,140 @@ internhunt2/
 
 ### Resume Classification Model
 
-InternHunt uses a **custom-trained ML model** to automatically categorize resumes into job roles.
+InternHunt uses a **custom-trained Logistic Regression model** with TF-IDF vectorization to automatically categorize resumes into 25 job roles with **99.5% accuracy**.
 
-#### **Model Details:**
-- **Algorithm:** scikit-learn classifier (trained on resume dataset)
+#### **Model Architecture:**
+- **Algorithm:** Logistic Regression (scikit-learn 1.7.2)
+- **Vectorization:** TF-IDF (Term Frequency-Inverse Document Frequency)
+- **Pipeline:** TfidfVectorizer → LogisticRegression
 - **File:** `resume_classifier_v2.pkl` (1.2 MB)
-- **Training Data:** `UpdatedResumeDataSet.csv` (3 MB, multiple resume samples)
-- **Purpose:** Automatic role categorization from resume text
+- **Training Data:** `UpdatedResumeDataSet.csv` (962 resume samples)
+
+#### **Model Performance:**
+| Metric | Score |
+|--------|-------|
+| **Test Accuracy** | **99.48%** |
+| **Precision** | **99.6%** (weighted) |
+| **Recall** | **99.5%** (weighted) |
+| **F1-Score** | **99.5%** (weighted) |
+| **Cross-Validation** | **99.48% ± 0.97%** (5-fold) |
+
+#### **Training Configuration:**
+```python
+Pipeline([
+    ('tfidf', TfidfVectorizer(
+        max_features=5000,        # Limit features to prevent overfitting
+        ngram_range=(1, 2),       # Use unigrams and bigrams
+        min_df=2,                 # Ignore terms in < 2 documents
+        max_df=0.95,              # Ignore terms in > 95% of documents
+        stop_words='english',     # Remove common English stop words
+        lowercase=True            # Normalize case
+    )),
+    ('classifier', LogisticRegression(
+        max_iter=1000,
+        class_weight='balanced',  # Handle class imbalance
+        random_state=42,
+        C=1.0                     # Regularization strength
+    ))
+])
+```
+
+#### **Dataset Split:**
+- **Training Set:** 769 samples (80%)
+- **Test Set:** 193 samples (20%)
+- **Stratified Split:** Maintains class distribution
+- **Total Classes:** 25 job categories
 
 #### **How It Works:**
 1. **Resume Upload** → User uploads PDF/DOCX resume
-2. **Text Extraction** → PyPDF2/python-docx extracts text content
-3. **NLP Processing** → NLTK tokenizes and cleans the text
-4. **Feature Extraction** → Converts text to numerical features
-5. **Classification** → ML model predicts the best-fit job role
-6. **Results** → Returns role category with confidence score
+2. **Text Extraction** → PyPDF2/python-docx extracts raw text
+3. **Text Cleaning** → Remove HTML tags, URLs, extra whitespace
+4. **TF-IDF Vectorization** → Convert text to numerical features (5000 features max)
+5. **Classification** → Logistic Regression predicts job category
+6. **Probability Analysis** → Returns confidence scores for top 3 predictions
 
-#### **Supported Job Categories:**
-The model can classify resumes into various tech roles including:
-- Software Development
-- Data Science
-- Web Development
-- Mobile Development
-- DevOps
-- And more...
+#### **Supported Job Categories (25 Total):**
 
-#### **Model Performance:**
-- Trained on diverse resume samples
-- Uses NLP techniques for text preprocessing
-- Optimized for accuracy and speed
+**Programming & Development:**
+- Java Developer (84 samples)
+- Python Developer (48 samples)
+- DotNet Developer (28 samples)
+- Web Designing (45 samples)
+- SAP Developer (24 samples)
+
+**Data & AI:**
+- Data Science (40 samples)
+- Hadoop (42 samples)
+- ETL Developer (40 samples)
+- Database (33 samples)
+
+**DevOps & Infrastructure:**
+- DevOps Engineer (55 samples)
+- Network Security Engineer (25 samples)
+
+**Testing:**
+- Testing (70 samples)
+- Automation Testing (26 samples)
+
+**Engineering:**
+- Mechanical Engineer (40 samples)
+- Electrical Engineering (30 samples)
+- Civil Engineer (24 samples)
+
+**Business & Operations:**
+- Business Analyst (28 samples)
+- Operations Manager (40 samples)
+- PMO (30 samples)
+- HR (44 samples)
+- Sales (40 samples)
+
+**Specialized:**
+- Blockchain (40 samples)
+- Advocate (20 samples)
+- Arts (36 samples)
+- Health and fitness (30 samples)
+
+#### **Model Features:**
+- ✅ **Multi-class Classification** - Predicts from 25 categories
+- ✅ **Probability Scores** - Returns confidence for each prediction
+- ✅ **Top-3 Predictions** - Shows 3 most likely roles with probabilities
+- ✅ **Version Compatibility** - Warns if sklearn version mismatch
+- ✅ **Balanced Classes** - Uses class_weight='balanced' for fair predictions
+- ✅ **Fallback Handling** - Graceful degradation if model unavailable
+
+#### **Technical Implementation:**
+```python
+# Model loading with version check
+data = joblib.load("resume_classifier_v2.pkl")
+model = data["model"]  # Pipeline object
+sklearn_version = data.get("sklearn_version")  # "1.7.2"
+
+# Prediction with probabilities
+predicted_category = model.predict([resume_text])[0]
+probabilities = model.predict_proba([resume_text])[0]
+classes = model.classes_
+
+# Top 3 predictions
+top_3_idx = probabilities.argsort()[-3:][::-1]
+top_3_predictions = [
+    {"category": classes[idx], "probability": probabilities[idx]}
+    for idx in top_3_idx
+]
+```
+
+#### **Training Details:**
+- **Trained on:** Google Colab
+- **Training Time:** < 1 minute
+- **Notebook:** `ResumeClassification_Model.ipynb`
+- **scikit-learn Version:** 1.7.2
+- **Random State:** 42 (for reproducibility)
 
 #### **Technologies Used:**
-- **scikit-learn** - ML framework
-- **NLTK** - Text preprocessing
-- **Pandas** - Data handling
-- **NumPy** - Numerical operations
-- **joblib** - Model serialization
+- **scikit-learn 1.7.2** - ML framework (Logistic Regression, TF-IDF)
+- **joblib** - Model serialization and loading
+- **pandas** - Data manipulation and preprocessing
+- **PyPDF2 / python-docx** - Resume text extraction
+- **Streamlit caching** - Fast model loading with `@st.cache_resource`
 
 ---
 
