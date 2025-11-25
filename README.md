@@ -118,7 +118,7 @@
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/yourusername/internhunt2.git
+git clone https://github.com/ShubhamSnSharma/internhunt2.git
 cd internhunt2
 ```
 
@@ -418,10 +418,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📊 Stats
 
-![GitHub stars](https://img.shields.io/github/stars/yourusername/internhunt2?style=social)
-![GitHub forks](https://img.shields.io/github/forks/yourusername/internhunt2?style=social)
-![GitHub issues](https://img.shields.io/github/issues/yourusername/internhunt2)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/yourusername/internhunt2)
+![GitHub stars](https://img.shields.io/github/stars/ShubhamSnSharma/internhunt2?style=social)
+![GitHub forks](https://img.shields.io/github/forks/ShubhamSnSharma/internhunt2?style=social)
+![GitHub issues](https://img.shields.io/github/issues/ShubhamSnSharma/internhunt2)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/ShubhamSnSharma/internhunt2)
 
 ---
 
