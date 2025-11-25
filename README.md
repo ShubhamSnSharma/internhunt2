@@ -9,21 +9,39 @@
 [![Google Gemini](https://img.shields.io/badge/Google%20Gemini-8E75B2?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
 [![scikit-learn](https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
 
+[![Vercel](https://img.shields.io/badge/Landing-Live_on_Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://internhuntt.vercel.app)
+[![Streamlit Cloud](https://img.shields.io/badge/App-Live_on_Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://internhunt.streamlit.app)
+
 **Intelligent Internship Matching Using ML, APIs & Web Data**
 
-[Features](#-features) • [Demo](#-demo) • [Installation](#-installation) • [Usage](#-usage) • [Tech Stack](#-tech-stack) • [Contributing](#-contributing)
+---
+
+### 🌐 **Live Demo**
+
+<div align="center">
+
+[![Landing Page](https://img.shields.io/badge/🌟_Landing_Page-Visit_Now-6366F1?style=for-the-badge&labelColor=1e293b)](https://internhuntt.vercel.app)
+[![Web App](https://img.shields.io/badge/🚀_Web_App-Try_Live-FF4B4B?style=for-the-badge&labelColor=1e293b)](https://internhunt.streamlit.app)
+
+**👉 Start at the [Landing Page](https://internhuntt.vercel.app) → Click "Upload Resume" → Experience the [Full App](https://internhunt.streamlit.app)!**
 
 </div>
 
 ---
 
-## 📸 Demo
+[Features](#-features) • [Screenshots](#-screenshots) • [Installation](#-installation) • [Usage](#-usage) • [Tech Stack](#-tech-stack) • [Contributing](#-contributing)
 
-> **Add your screenshots here!**
+</div>
 
-### 🏠 Landing Page
+---
+
+## 📸 Screenshots
+
+> **💡 Want to see it in action? Check out the [Live Demo](https://internhuntt.vercel.app)!**
+
+### 🏠 Landing Page (Vercel)
 ![Landing Page](./screenshots/landing-page.png)
-*Beautiful hero section with animated scroll indicator*
+*Beautiful Figma-designed landing page hosted on Vercel*
 
 ### 💼 Resume Analysis
 ![Resume Upload](./screenshots/resume-upload.png)
@@ -40,6 +58,10 @@
 ### 🔍 Job Search
 ![Job Search](./screenshots/job-search.png)
 *Real-time internship opportunities from multiple sources*
+
+### 🔐 Admin Dashboard
+![Admin Dashboard](./screenshots/admin-dashboard.png)
+*User management and analytics powered by Neon PostgreSQL*
 
 ---
 
@@ -74,6 +96,13 @@
 - ✨ **Glassmorphism** - Modern design aesthetics
 - 📱 **Responsive** - Works on all devices
 - 🎭 **Smooth Animations** - Delightful user experience
+
+### 🔐 **Admin Dashboard**
+- 👨‍💼 **User Management** - Track and manage users
+- 📊 **Analytics** - View platform statistics
+- 💾 **Cloud Database** - Powered by Neon (PostgreSQL)
+- 🌐 **Web-based** - Access from anywhere
+- 🔄 **Real-time Sync** - Instant data updates
 
 ---
 
@@ -144,7 +173,10 @@ Create a `.env` file in the root directory:
 GEMINI_API_KEY=your_gemini_api_key_here
 GEMINI_MODEL=gemini-1.5-flash
 
-# Optional: Database Configuration
+# Neon Database (PostgreSQL) - Production
+DATABASE_URL=postgresql://user:password@host.neon.tech/dbname?sslmode=require
+
+# MySQL (Local Development - Optional)
 DB_HOST=localhost
 DB_USER=root
 DB_PASSWORD=your_password
@@ -159,13 +191,92 @@ For Streamlit Cloud deployment, add secrets in the dashboard:
 # .streamlit/secrets.toml
 GEMINI_API_KEY = "your_api_key_here"
 GEMINI_MODEL = "gemini-1.5-flash"
+
+# Neon Database
+DATABASE_URL = "postgresql://user:password@host.neon.tech/dbname?sslmode=require"
 ```
+
+### Setting up Neon Database
+
+1. **Create a Neon account** at [neon.tech](https://neon.tech)
+2. **Create a new project** and database
+3. **Copy the connection string** from the dashboard
+4. **Add to `.env`** file as `DATABASE_URL`
+5. **Run migrations** (if any) to set up tables
 
 ---
 
+## � Deployment Architecture
+
+This project uses a **dual-deployment strategy** for optimal user experience:
+
+### 🎨 **Landing Page** (Vercel)
+- **URL:** [internhuntt.vercel.app](https://internhuntt.vercel.app)
+- **Tech:** React + TypeScript + Tailwind CSS v4
+- **Design:** Figma → React components
+- **Features:** Glassmorphism, smooth animations (Motion)
+- **Icons:** Lucide React
+- **UI Components:** Shadcn/ui
+- **Hosting:** Vercel (Fast CDN, global edge network)
+
+### ⚡ **Web Application** (Streamlit Cloud)
+- **URL:** [internhunt.streamlit.app](https://internhunt.streamlit.app)
+- **Tech:** Python + Streamlit
+- **Purpose:** Full-featured AI-powered platform
+- **Hosting:** Streamlit Cloud (Free Python app hosting)
+
+### � **Database** (Neon)
+- **Service:** [Neon](https://neon.tech) - Serverless PostgreSQL
+- **Purpose:** User data, analytics, admin dashboard
+- **Migration:** Originally MySQL (local) → Now Neon (cloud)
+- **Benefits:** Auto-scaling, branching, serverless
+
+### �🔗 **How They Connect**
+```
+User visits Landing Page (Vercel)
+         ↓
+Clicks "Upload Resume" button
+         ↓
+Redirects to Web App (Streamlit)
+         ↓
+App connects to Neon Database
+         ↓
+Full InternHunt experience!
+```
+
+### 📦 **Deploy Your Own**
+
+#### **Vercel (Landing Page)**
+1. Push your landing page code to GitHub
+2. Import project on [Vercel](https://vercel.com)
+3. Deploy with one click!
+
+#### **Streamlit Cloud (Web App)**
+1. Push this repo to GitHub
+2. Go to [share.streamlit.io](https://share.streamlit.io)
+3. Connect your GitHub repo
+4. Add secrets (API keys) in dashboard
+5. Deploy!
+
+#### **Neon (Database)**
+1. Create account at [neon.tech](https://neon.tech)
+2. Create a new PostgreSQL database
+3. Copy connection string
+4. Add to Streamlit secrets as `DATABASE_URL`
+5. Database is ready!
+
+---
 ## 🛠️ Tech Stack
 
-### **Frontend**
+### **Landing Page (Vercel)**
+- ![React](https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB) **React** - UI library
+- ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat-square&logo=typescript&logoColor=white) **TypeScript** - Type-safe JavaScript
+- ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white) **Tailwind CSS v4** - Utility-first CSS
+- ![Motion](https://img.shields.io/badge/Motion-FF0080?style=flat-square&logo=framer&logoColor=white) **Motion** - Animation library
+- **Shadcn/ui** - Component library
+- **Lucide React** - Icon library
+
+### **Web Application (Streamlit)**
 - ![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=flat-square&logo=streamlit&logoColor=white) **Streamlit** - Web framework
 - ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white) **HTML/CSS** - Custom styling
 - ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black) **JavaScript** - Interactive elements
@@ -185,6 +296,11 @@ GEMINI_MODEL = "gemini-1.5-flash"
 - ![Pandas](https://img.shields.io/badge/Pandas-150458?style=flat-square&logo=pandas&logoColor=white) **Pandas** - Data manipulation
 - ![NumPy](https://img.shields.io/badge/NumPy-013243?style=flat-square&logo=numpy&logoColor=white) **NumPy** - Numerical computing
 - **PyPDF2 & python-docx** - Document parsing
+
+### **Database**
+- ![Neon](https://img.shields.io/badge/Neon-00E599?style=flat-square&logo=postgresql&logoColor=white) **Neon** - Serverless PostgreSQL
+- ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=flat-square&logo=postgresql&logoColor=white) **PostgreSQL** - Relational database
+- ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=mysql&logoColor=white) **MySQL** - Alternative database (local development)
 
 ---
 
