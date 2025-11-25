@@ -11,7 +11,7 @@ Features:
 
 Environment Variables (required):
 - GEMINI_API_KEY: Your Google Gemini API key
-- GEMINI_MODEL: Model to use (default: gemini-1.5-pro)
+- GEMINI_MODEL: Model to use (default: gemini-1.5-flash)
 """
 from __future__ import annotations
 
@@ -40,7 +40,7 @@ def _get_gemini_config() -> Tuple[str, str]:
                    "").strip()
         model = (os.getenv("GEMINI_MODEL") or
                  (st_secrets.get('GEMINI_MODEL') if st_secrets else None) or
-                 "gemini-2.5-flash").strip()
+                 "gemini-1.5-flash").strip()
 
         if not api_key or api_key == "your_gemini_api_key_here":
             raise ValueError("Gemini API key not found in environment variables or Streamlit secrets")
@@ -62,7 +62,7 @@ You are a friendly career mentor helping someone with their job search. Be conve
 - Write naturally like you're texting a friend who asked for career advice
 - NO asterisks, NO bold markers (***), NO excessive formatting
 - Use simple bullet points with dashes (-) or emojis when listing things
-- Keep responses under 120 words
+- Keep responses under 150 words unless asked for detail
 - Be encouraging but honest
 - Use "you/your" to make it personal
 
@@ -195,14 +195,21 @@ def chat_gemini(messages: List[Dict[str, str]], resume_context: Optional[str] = 
         # Format resume context if available
         formatted_context = "No resume information available. Ask the user to upload their resume for personalized advice."
         if resume_context and len(resume_context) > 10:  # Basic check for meaningful content
-            formatted_context = resume_context[:3000]
+            # Truncate context if it's excessively long (approx 12k chars ~ 3k tokens)
+            # Gemini 1.5 Flash has huge context, but we keep it reasonable for latency
+            if len(resume_context) > 12000:
+                formatted_context = resume_context[:12000] + "\n...[truncated]"
+            else:
+                formatted_context = resume_context
         
         # Inject resume context into the system prompt
         sys_prompt = sys_prompt.format(resume_context=formatted_context)
         
-        # Build a compact conversation summary (last 3 exchanges) to stay within quota
+        # Build conversation history
+        # Gemini 1.5 Flash has a large context window, so we can include more history
         history = []
-        for msg in messages[-6:]:  # up to 3 exchanges
+        # Include last 10 messages (5 turns)
+        for msg in messages[-10:]:
             role = msg.get("role", "user")
             content = (msg.get("content", "") or "").strip()
             if not content:
@@ -214,17 +221,19 @@ def chat_gemini(messages: List[Dict[str, str]], resume_context: Optional[str] = 
         # Single API call per question
         prompt = (
             f"{sys_prompt}\n\n"
-            f"Resume summary (use this context in your answer):\n{formatted_context}\n\n"
-            f"Conversation so far:\n{history_text}\n\n"
+            f"Candidate Profile Context (use this to personalize your answer):\n{formatted_context}\n\n"
+            f"Conversation History:\n{history_text}\n\n"
+            f"IMPORTANT: Answer the user's LATEST question from the history above. Do not just summarize the resume unless asked.\n"
             f"Assistant:"
         )
+        
         response = model.generate_content(
             prompt,
             generation_config=genai.types.GenerationConfig(
                 temperature=0.7,
                 top_p=0.9,
                 top_k=40,
-                max_output_tokens=1024,  # Increased for longer responses
+                max_output_tokens=4096,  # Significantly increased from 1024
             ),
             safety_settings=[
                 {
@@ -258,7 +267,12 @@ def chat_gemini(messages: List[Dict[str, str]], resume_context: Optional[str] = 
                 if candidate.finish_reason == 3:  # SAFETY
                     return "⚠️ The response was blocked by safety filters. Please rephrase your question."
                 elif candidate.finish_reason == 2:  # MAX_TOKENS
-                    return "⚠️ The response was too long. Please ask a more specific question."
+                    # Instead of erroring, return what we have so far
+                    partial_text = ""
+                    if hasattr(candidate, 'content') and hasattr(candidate.content, 'parts'):
+                         text_parts = [part.text for part in candidate.content.parts if hasattr(part, 'text')]
+                         partial_text = ''.join(text_parts)
+                    return _format_conversational_response(partial_text + "\n\n[Response truncated due to length]")
                 elif candidate.finish_reason not in [1, 0]:  # Not STOP or UNSPECIFIED
                     return "⚠️ I encountered an issue generating the response. Please try again with a different question."
         
@@ -443,7 +457,7 @@ def build_resume_context(resume_data: Dict[str, Any]) -> str:
         if proj_info:
             context_parts.append(f"Key Projects: {', '.join(proj_info)}")
     
-    return '\n'.join(context_parts)
+    return '\\n'.join(context_parts)
 
 # Export public API
 __all__ = [
